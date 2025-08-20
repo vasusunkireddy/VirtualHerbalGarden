@@ -23,98 +23,140 @@
 
     .overlay {
       position: fixed; inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.65);
       z-index: 0;
+      backdrop-filter: blur(3px);
     }
 
     .auth-container {
       position: relative; z-index: 1;
       background: rgba(255, 255, 255, 0.98);
       padding: 2.5rem 2rem;
-      border-radius: 1.3rem;
-      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
-      width: min(90%, 420px);
-      max-width: 440px;
+      border-radius: 1.5rem;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+      width: min(90%, 460px);
+      max-width: 480px;
       text-align: center;
       margin: 1.5rem;
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .auth-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     }
 
     .auth-container img {
-      width: 100px; height: 100px; border-radius: 50%;
-      margin-bottom: 1.5rem; border: 3px solid #4caf50;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 110px; height: 110px; border-radius: 50%;
+      margin-bottom: 1.8rem; border: 4px solid #4caf50;
+      transition: transform 0.6s ease, box-shadow 0.3s ease;
     }
-    .auth-container img:hover { transform: scale(1.06); box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
+    .auth-container img.logo-rotate {
+      transform: rotate(360deg);
+    }
+    .auth-container img:hover {
+      transform: scale(1.08) rotate(5deg);
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+    }
 
     .auth-container h2 {
       margin-bottom: 2rem; color: #2e7d32;
-      font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: 0.03em;
+      font-size: 2.1rem; font-weight: 700; line-height: 1.2; letter-spacing: 0.03em;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .input-group { position: relative; margin: 1rem 0; }
+    .input-group { position: relative; margin: 1.2rem 0; }
     .input-group i {
       position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-      color: #4caf50; font-size: 1.15rem;
+      color: #4caf50; font-size: 1.2rem;
+      transition: color 0.3s ease;
     }
 
     .auth-container input, .auth-container select {
-      width: 100%; padding: 0.9rem 0.9rem 0.9rem 2.8rem; margin: 0.6rem 0;
-      border: 1px solid #e0e0e0; border-radius: 0.7rem; font-size: 1rem; line-height: 1.5;
-      outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+      width: 100%; padding: 1rem 1rem 1rem 3rem; margin: 0.7rem 0;
+      border: 1px solid #e0e0e0; border-radius: 0.8rem; font-size: 1.05rem; line-height: 1.5;
+      outline: none; transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
       -webkit-appearance: none; -moz-appearance: none; appearance: none;
+      background: #f9f9f9;
     }
-    .auth-container select { padding: 0.9rem; }
+    .auth-container select { padding: 1rem; }
 
     .auth-container input:focus, .auth-container select:focus {
-      border-color: #4caf50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+      border-color: #4caf50; box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+      background: #fff;
     }
 
     .auth-container button {
-      width: 100%; padding: 1rem; margin-top: 1.5rem;
+      width: 100%; padding: 1.1rem; margin-top: 1.8rem;
       background: linear-gradient(90deg, #2e7d32, #4caf50);
-      color: #fff; border: none; border-radius: 0.7rem; cursor: pointer;
-      font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      color: #fff; border: none; border-radius: 0.8rem; cursor: pointer;
+      font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s, filter 0.3s;
     }
-    .auth-container button:hover { background: linear-gradient(90deg, #43a047, #66bb6a); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(76, 175, 80, 0.35); }
+    .auth-container button:hover {
+      background: linear-gradient(90deg, #43a047, #66bb6a);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+      filter: brightness(1.1);
+    }
     .auth-container button:active { transform: translateY(0); }
 
-    .auth-container p { margin-top: 1.5rem; font-size: 0.95rem; color: #333; font-weight: 500; line-height: 1.4; }
-    .auth-container a { color: #2e7d32; text-decoration: none; font-weight: 600; transition: color 0.3s; }
-    .auth-container a:hover { color: #4caf50; text-decoration: underline; }
+    .auth-container p {
+      margin-top: 1.8rem; font-size: 0.95rem; color: #333;
+      font-weight: 500; line-height: 1.5; transition: color 0.3s;
+    }
+    .auth-container a {
+      color: #2e7d32; text-decoration: none; font-weight: 600;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+    .auth-container a:hover {
+      color: #4caf50; text-decoration: underline;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
 
     .step-container { display: none; }
     .step-container.active { display: block; }
 
     .toast {
       position: fixed; top: 1.5rem; right: 1.5rem; background: #fff;
-      padding: 1rem 1.5rem; border-radius: 0.7rem; box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+      padding: 1rem 1.5rem; border-radius: 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.15);
       z-index: 1000; display: flex; align-items: center; opacity: 0; transform: translateY(-20px);
-      transition: opacity 0.3s ease, transform 0.3s ease; max-width: 90%; width: 340px;
+      transition: opacity 0.4s ease, transform 0.4s ease; max-width: 90%; width: 360px;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-left: 5px solid #2e7d32; }
-    .toast.error { border-left: 5px solid #d32f2f; }
+    .toast.success { border-left: 6px solid #2e7d32; }
+    .toast.error { border-left: 6px solid #d32f2f; }
     .toast .toast-message { flex: 1; font-size: 0.95rem; color: #333; font-weight: 500; }
-    .toast .toast-close { margin-left: 0.8rem; cursor: pointer; font-size: 1.2rem; color: #666; }
+    .toast .toast-close { margin-left: 1rem; cursor: pointer; font-size: 1.3rem; color: #666; }
     .toast .toast-close:hover { color: #333; }
 
-    @media (max-width: 600px) {
-      .auth-container { padding: 2rem 1.5rem; width: 92%; margin: 1rem; }
-      .auth-container h2 { font-size: 1.7rem; }
+    @media (max-width: 768px) {
+      .auth-container { padding: 2rem 1.8rem; width: 90%; max-width: 420px; }
+      .auth-container h2 { font-size: 1.9rem; }
+      .auth-container img { width: 90px; height: 90px; }
+      .auth-container input, .auth-container select { font-size: 1rem; padding: 0.9rem 0.9rem 0.9rem 2.8rem; }
+      .auth-container select { padding: 0.9rem; }
+      .auth-container button { font-size: 1.05rem; padding: 1rem; }
+      .auth-container p { font-size: 0.92rem; }
+      .toast { width: 90%; max-width: 340px; font-size: 0.9rem; padding: 0.9rem 1.3rem; }
+    }
+
+    @media (max-width: 480px) {
+      .auth-container { padding: 1.8rem 1.4rem; width: 95%; margin: 1rem; }
+      .auth-container h2 { font-size: 1.6rem; }
       .auth-container img { width: 80px; height: 80px; }
       .auth-container input, .auth-container select { font-size: 0.95rem; padding: 0.8rem 0.8rem 0.8rem 2.5rem; }
       .auth-container select { padding: 0.8rem; }
-      .auth-container button { font-size: 1rem; padding: 0.9rem; }
+      .auth-container button { font-size: 0.95rem; padding: 0.9rem; }
       .auth-container p { font-size: 0.9rem; }
-      .toast { width: 90%; font-size: 0.9rem; padding: 0.9rem 1.2rem; }
+      .toast { width: 95%; max-width: 300px; font-size: 0.85rem; padding: 0.8rem 1.2rem; }
     }
 
-    @media (max-width: 400px) {
-      .auth-container { padding: 1.8rem 1.2rem; }
-      .auth-container h2 { font-size: 1.5rem; }
+    @media (max-width: 360px) {
+      .auth-container { padding: 1.6rem 1.2rem; }
+      .auth-container h2 { font-size: 1.4rem; }
       .auth-container img { width: 70px; height: 70px; }
+      .toast { padding: 0.7rem 1rem; }
     }
   </style>
 </head>
@@ -210,7 +252,6 @@
   </div>
 
   <script>
-    // ✅ Works on localhost and Render (served by the same Express app)
     const API_BASE_URL = '/api/auth';
 
     function showToast(message, type = 'success') {
@@ -226,53 +267,75 @@
 
       const closeToast = () => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
+        setTimeout(() => toast.remove(), 400);
       };
       toast.querySelector('.toast-close').addEventListener('click', closeToast);
-      setTimeout(closeToast, 3000);
+      setTimeout(closeToast, 3500);
     }
 
     function showSignup() {
       const loginContainer = document.getElementById('loginContainer');
       const signupContainer = document.getElementById('signupContainer');
       const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+      const signupLogo = signupContainer.querySelector('img');
+      
       loginContainer.style.opacity = '0';
+      loginContainer.style.transform = 'translateY(20px)';
+      signupLogo.classList.add('logo-rotate');
+      
       setTimeout(() => {
         loginContainer.style.display = 'none';
         signupContainer.style.display = 'block';
         signupContainer.style.opacity = '1';
+        signupContainer.style.transform = 'translateY(0)';
         forgotPasswordContainer.style.display = 'none';
-      }, 300);
+        setTimeout(() => signupLogo.classList.remove('logo-rotate'), 600);
+      }, 400);
     }
 
     function showLogin() {
       const signupContainer = document.getElementById('signupContainer');
       const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
       const loginContainer = document.getElementById('loginContainer');
+      const loginLogo = loginContainer.querySelector('img');
+      
       signupContainer.style.opacity = '0';
       forgotPasswordContainer.style.opacity = '0';
+      signupContainer.style.transform = 'translateY(20px)';
+      forgotPasswordContainer.style.transform = 'translateY(20px)';
+      loginLogo.classList.add('logo-rotate');
+      
       setTimeout(() => {
         signupContainer.style.display = 'none';
         forgotPasswordContainer.style.display = 'none';
         loginContainer.style.display = 'block';
         loginContainer.style.opacity = '1';
-      }, 300);
+        loginContainer.style.transform = 'translateY(0)';
+        setTimeout(() => loginLogo.classList.remove('logo-rotate'), 600);
+      }, 400);
     }
 
     function showForgotPassword() {
       const loginContainer = document.getElementById('loginContainer');
       const signupContainer = document.getElementById('signupContainer');
       const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+      const forgotLogo = forgotPasswordContainer.querySelector('img');
+      
       loginContainer.style.opacity = '0';
+      loginContainer.style.transform = 'translateY(20px)';
+      forgotLogo.classList.add('logo-rotate');
+      
       setTimeout(() => {
         loginContainer.style.display = 'none';
         signupContainer.style.display = 'none';
         forgotPasswordContainer.style.display = 'block';
         forgotPasswordContainer.style.opacity = '1';
+        forgotPasswordContainer.style.transform = 'translateY(0)';
         document.getElementById('emailStep').classList.add('active');
         document.getElementById('otpStep').classList.remove('active');
         document.getElementById('newPasswordStep').classList.remove('active');
-      }, 300);
+        setTimeout(() => forgotLogo.classList.remove('logo-rotate'), 600);
+      }, 400);
     }
 
     async function handleLogin() {
@@ -355,8 +418,9 @@
         const data = await response.json();
         if (response.ok) {
           showToast(data.message || 'OTP sent', 'success');
-          document.getElementById('emailStep').classList.remove('active');
+          document.getElementById('emailStep').classList.add('active');
           document.getElementById('otpStep').classList.add('active');
+          document.getElementById('emailStep').classList.remove('active');
         } else {
           showToast(data.message || 'Failed to send OTP', 'error');
         }
