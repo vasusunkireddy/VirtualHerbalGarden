@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Manage plants for Virtual Herbal Garden — add, edit, publish, and organize by AYUSH systems."/>
+  <meta name="csrf-token" content="your-csrf-token-here"/>
+  <title>Plants | Admin | Virtual Herbal Garden</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+
+  <style>
+    :root {
+      --primary-blue: #1E3A8A;
+      --primary-blue-600: #2A5298;
+      --secondary-gold: #D4AF37;
+      --bg-0: #E6E8F2;
+      --bg-1: #F5F5F5;
+      --text: #2D3748;
+      --muted: #6B7280;
+      --white: #ffffff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --danger: #EF4444;
+      --good: #22C55E;
+      --shadow-sm: 0 2px 8px rgba(30,58,138,.10);
+      --shadow-md: 0 4px 16px rgba(30,58,138,.15);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-0), var(--bg-1));
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-blue-600));
+      color: #fff;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: var(--shadow-md);
+    }
+    header img { height: 44px; width: 44px; border-radius: 10px; }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; }
+    header .sp { color: var(--secondary-gold); font-weight: 700; font-size: .95rem; }
+    .header-actions { margin-left: auto; display: flex; gap: .6rem; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .5rem .9rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .logout {
+      background: linear-gradient(45deg, var(--secondary-gold), #ea3553);
+      border: none;
+      padding: .55rem 1rem;
+      color: #0f172a;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Nav */
+    nav {
+      background: var(--primary-blue);
+      display: flex;
+      flex-wrap: wrap;
+      gap: .25rem;
+      padding: .35rem .5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    nav a {
+      flex: 0 1 180px;
+      padding: .8rem;
+      text-align: center;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 10px;
+    }
+    nav a:hover { background: var(--secondary-gold); color: var(--primary-blue); }
+    nav a.active { background: #fff; color: var(--primary-blue); }
+
+    .container { max-width: 1280px; margin: 1.2rem auto 2rem; padding: 0 1rem; }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      align-items: center;
+      margin-bottom: .8rem;
+    }
+    .search {
+      flex: 1 1 280px;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .55rem .75rem;
+    }
+    .search input { border: none; outline: none; width: 100%; font-size: 1rem; }
+    .select, .btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 10px;
+      padding: .55rem .75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn.primary { background: linear-gradient(180deg, #ffffff, #f8fafc); }
+    .btn.cta { background: linear-gradient(45deg, #22c55e, #16a34a); color: #fff; border: none; }
+    .btn.danger { background: linear-gradient(45deg, #ef4444, #dc2626); color: #fff; border: none; }
+    .btn[disabled] { opacity: .6; cursor: not-allowed; }
+
+    /* Card/Table */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    thead th {
+      background: #f8fafc;
+      text-align: left;
+      font-size: .9rem;
+      color: #334155;
+      padding: .7rem .8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: .7rem .8rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .badge {
+      display: inline-block;
+      padding: .18rem .55rem;
+      border-radius: 999px;
+      font-size: .78rem;
+      border: 1px solid var(--border);
+      background: #f1f5f9;
+    }
+    .status.pub { background: rgba(34,197,94,.12); color: #065f46; border-color: rgba(34,197,94,.25); }
+    .status.draft { background: rgba(234,179,8,.15); color: #78350f; border-color: rgba(234,179,8,.3); }
+    .status.arch { background: rgba(2,132,199,.15); color: #0c4a6e; border-color: rgba(2,132,199,.3); }
+    .actions { display: flex; gap: .4rem; }
+    .actions .iconbtn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 9px;
+      padding: .35rem .5rem;
+      cursor: pointer;
+    }
+    .thumb { width: 58px; height: 58px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); }
+    .empty { padding: 1rem; color: var(--muted); text-align: center; }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .loading::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--primary-blue);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Pagination */
+    .pagination { display: flex; justify-content: flex-end; gap: .4rem; margin-top: .8rem; }
+    .pagebtn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 10px;
+      padding: .45rem .7rem;
+      cursor: pointer;
+    }
+    .pagebtn.active { background: var(--primary-blue); color: #fff; border: none; }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: .8rem;
+    }
+    .modal.show { display: flex; }
+    .sheet {
+      max-width: 860px;
+      width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .sheet header {
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-blue-600));
+      color: #fff;
+      padding: .9rem 1rem;
+      position: relative;
+    }
+    .sheet header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+    .sheet .body { padding: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .sheet .row { display: flex; flex-direction: column; gap: .35rem; }
+    .sheet label { font-weight: 700; font-size: .92rem; }
+    .sheet input, .sheet textarea, .sheet select {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .55rem .65rem;
+      font-size: 1rem;
+    }
+    .sheet textarea { min-height: 120px; resize: vertical; }
+    .sheet .footer {
+      padding: .9rem 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: .6rem;
+      border-top: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .preview { display: flex; align-items: center; gap: .6rem; }
+    .preview img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); }
+    .muted { color: var(--muted); font-size: .92rem; }
+    .upload-btn {
+      background: linear-gradient(45deg, #22c55e, #16a34a);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .55rem .75rem;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .upload-btn:hover { background: linear-gradient(45deg, #16a34a, #15803d); }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      min-width: 260px;
+      max-width: 86vw;
+      padding: .85rem 1rem;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, translate .25s ease;
+      translate: 0 10px;
+      z-index: 9999;
+    }
+    #toast.show { opacity: 1; pointer-events: auto; translate: 0 0; }
+    #toast.success { border-color: rgba(34,197,94,.35); }
+    #toast.error { border-color: rgba(239,68,68,.35); }
+    #toast .tmsg { display: flex; align-items: center; gap: .55rem; font-weight: 700; }
+
+    @media (max-width: 980px) { .sheet .body { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"><span class="tmsg"></span></div>
+
+  <!-- Header -->
+  <header>
+    <img src="https://res.cloudinary.com/do9cbfu5l/image/upload/v1234567890/vhg-logo.jpg" alt="Logo">
+    <div>
+      <h1>Virtual Herbal Garden</h1>
+      <div class="sp">Admin • Plants</div>
+    </div>
+    <div class="header-actions">
+      <a class="pill" href="admindashboard.html"><i class="fa-solid fa-gauge-high"></i> Overview</a>
+      <button class="logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </header>
+
+  <!-- Nav -->
+  <nav aria-label="Primary">
+    <a href="adminplants.html" class="active"><i class="fa-solid fa-seedling"></i> Plants</a>
+    <a href="admincategories.html"><i class="fa-solid fa-layer-group"></i> Categories</a>
+    <a href="admintours.html"><i class="fa-solid fa-vr-cardboard"></i> Virtual Tours</a>
+    <a href="adminprogress.html"><i class="fa-solid fa-chart-line"></i> Progress</a>
+    <a href="admindashboard.html"><i class="fa-solid fa-house"></i> Home</a>
+  </nav>
+
+  <main class="container">
+    <!-- Toolbar -->
+    <div class="toolbar card">
+      <div class="search" role="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="q" type="search" placeholder="Search by name, scientific name, alias…" autocomplete="off"/>
+      </div>
+      <select id="systemFilter" class="select" title="AYUSH System">
+        <option value="">All Systems</option>
+      </select>
+      <select id="statusFilter" class="select" title="Status">
+        <option value="">All Status</option>
+        <option value="published">Published</option>
+        <option value="draft">Draft</option>
+        <option value="archived">Archived</option>
+      </select>
+      <button id="bulkPublish" class="btn primary" disabled><i class="fa-solid fa-toggle-on"></i> Publish</button>
+      <button id="bulkArchive" class="btn primary" disabled><i class="fa-solid fa-box-archive"></i> Archive</button>
+      <button id="bulkDelete" class="btn danger" disabled><i class="fa-solid fa-trash-can"></i> Delete</button>
+      <button id="addPlant" class="btn cta" style="margin-left:auto"><i class="fa-solid fa-plus"></i> Add Plant</button>
+    </div>
+
+    <!-- Table -->
+    <section class="card">
+      <table id="plantTable" aria-describedby="tableHelp">
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" id="checkAll" aria-label="Select all plants"></th>
+            <th style="width:64px">Image</th>
+            <th>Name</th>
+            <th style="width:18%">Scientific</th>
+            <th style="width:12%">System</th>
+            <th style="width:10%">Status</th>
+            <th style="width:14%">Updated</th>
+            <th style="width:140px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="8" class="empty loading">Loading plants…</td></tr>
+        </tbody>
+      </table>
+      <div id="tableHelp" class="muted" style="margin-top:.6rem">Tip: Click a row to preview; use the toggles above for bulk actions.</div>
+      <div class="pagination" id="pager"></div>
+    </section>
+  </main>
+
+  <!-- Create/Edit Modal -->
+  <div class="modal" id="plantModal" aria-hidden="true" aria-labelledby="modalTitle" aria-modal="true" role="dialog">
+    <div class="sheet">
+      <header>
+        <h3 id="modalTitle">Add Plant</h3>
+      </header>
+      <form id="plantForm">
+        <div class="body">
+          <div class="row">
+            <label for="common_name">Common Name *</label>
+            <input id="common_name" name="common_name" required placeholder="Tulsi / Holy Basil"/>
+          </div>
+          <div class="row">
+            <label for="scientific_name">Scientific Name *</label>
+            <input id="scientific_name" name="scientific_name" required placeholder="Ocimum tenuiflorum"/>
+          </div>
+          <div class="row">
+            <label for="aliases">Aliases / Synonyms</label>
+            <input id="aliases" name="aliases" placeholder="Tulasi, Holy Basil"/>
+            <small class="muted">Comma-separated</small>
+          </div>
+          <div class="row">
+            <label for="system_id">AYUSH System *</label>
+            <select id="system_id" name="system_id" required>
+              <option value="">Select system</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="parts_used">Parts Used</label>
+            <input id="parts_used" name="parts_used" placeholder="Leaves, Seeds, Root"/>
+          </div>
+          <div class="row">
+            <label for="indications">Indications (Therapeutic Uses)</label>
+            <textarea id="indications" name="indications" placeholder="Immunity support, cold relief…"></textarea>
+          </div>
+          <div class="row">
+            <label for="image_url">Cover Image *</label>
+            <input id="image_url" name="image_url" readonly placeholder="Click to upload"/>
+            <button type="button" class="upload-btn" id="uploadCover"><i class="fa-solid fa-upload"></i> Upload Image</button>
+            <div class="preview"><img id="imgPreview" alt="Preview"/><span class="muted">Preview updates after upload</span></div>
+          </div>
+          <div class="row">
+            <label for="model_url">3D Model (.glb/.gltf)</label>
+            <input id="model_url" name="model_url" readonly placeholder="Click to upload"/>
+            <button type="button" class="upload-btn" id="uploadModel"><i class="fa-solid fa-upload"></i> Upload 3D Model</button>
+          </div>
+          <div class="row">
+            <label for="youtube_url">YouTube Video URL</label>
+            <input id="youtube_url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=…"/>
+          </div>
+          <div class="row">
+            <label for="status">Status *</label>
+            <select id="status" name="status" required>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="tags">Tags / Themes</label>
+            <input id="tags" name="tags" placeholder="immunity, skincare, digestion"/>
+            <small class="muted">Comma-separated</small>
+          </div>
+        </div>
+        <div class="footer">
+          <button type="button" class="btn" id="closeModal">Cancel</button>
+          <button type="submit" class="btn cta" id="saveBtn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* ======= Utilities ======= */
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+    const state = { page: 1, limit: 10, total: 0, systems: [], filters: { q: '', system: '', status: '' }, selection: new Set(), editing: null };
+
+    function toast(msg, type = 'success') {
+      const t = $('#toast');
+      const box = t.querySelector('.tmsg');
+      t.classList.remove('success', 'error', 'show');
+      t.classList.add(type);
+      box.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> ${msg}`;
+      void t.offsetWidth;
+      t.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    async function api(method, url, body) {
+      const headers = {
+        'Content-Type': body && !(body instanceof FormData) ? 'application/json' : undefined,
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+      };
+      try {
+        const res = await fetch(url, {
+          method,
+          credentials: 'include',
+          cache: 'no-store',
+          headers: Object.fromEntries(Object.entries(headers).filter(([_, v]) => v !== undefined)),
+          body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined,
+        });
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.message || `${res.status} ${res.statusText}`);
+        }
+        return res.status === 204 ? null : res.json();
+      } catch (error) {
+        console.error(`API Error (${method} ${url}):`, error);
+        throw error;
+      }
+    }
+
+    function fmtDate(s) {
+      if (!s) return '—';
+      const d = new Date(s);
+      return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).format(d);
+    }
+    function esc(str) { return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
+
+    /* ======= Cloudinary Upload ======= */
+    const cloudinaryConfig = {
+      cloudName: 'do9cbfu5l',
+      apiKey: '756894868516719',
+      uploadPreset: 'herbal_garden_upload',
+    };
+
+    function initCloudinary(type, inputId, previewId) {
+      const widget = cloudinary.createUploadWidget({
+        cloudName: cloudinaryConfig.cloudName,
+        apiKey: cloudinaryConfig.apiKey,
+        uploadPreset: cloudinaryConfig.uploadPreset,
+        cropping: type === 'image',
+        multiple: false,
+        resourceType: type === 'image' ? 'image' : 'raw',
+        clientAllowedFormats: type === 'image' ? ['jpg', 'png', 'jpeg'] : ['glb', 'gltf'],
+        maxFileSize: type === 'image' ? 10000000 : 50000000,
+        sources: ['local', 'url', 'camera'],
+        folder: `virtual_herbal/${type === 'image' ? 'images' : 'models'}`,
+      }, (error, result) => {
+        if (!error && result && result.event === 'success') {
+          const url = result.info.secure_url;
+          $(`#${inputId}`).value = url;
+          if (type === 'image' && previewId) $(`#${previewId}`).src = url;
+          toast(`${type === 'image' ? 'Image' : '3D Model'} uploaded successfully`);
+        } else if (error) {
+          console.error('Cloudinary Upload Error:', error);
+          toast(`Failed to upload ${type === 'image' ? 'image' : '3D model'}. ${error.message || 'Please try again.'}`, 'error');
+        }
+      });
+      return widget;
+    }
+
+    const coverUploadWidget = initCloudinary('image', 'image_url', 'imgPreview');
+    const modelUploadWidget = initCloudinary('model', 'model_url');
+
+    /* ======= Auth Guard ======= */
+    (async function guard() {
+      try {
+        await api('GET', '/api/auth/check');
+      } catch (e) {
+        toast('Authentication required', 'error');
+        setTimeout(() => location.href = '/admin.html', 1200);
+      }
+    })();
+
+    /* ======= Systems ======= */
+    async function loadSystems() {
+      try {
+        const systems = [
+          { id: 1, name: 'Ayurveda' },
+          { id: 2, name: 'Yoga' },
+          { id: 3, name: 'Unani' },
+          { id: 4, name: 'Siddha' },
+          { id: 5, name: 'Homoeopathy' },
+          { id: 6, name: 'Naturopathy' }
+        ]; // Replace with API call if available
+        state.systems = systems;
+        const sel = $('#systemFilter');
+        const selForm = $('#system_id');
+        sel.innerHTML = `<option value="">All Systems</option>` + systems.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+        selForm.innerHTML = `<option value="">Select system</option>` + systems.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+      } catch (e) {
+        console.error(e);
+        toast('Failed to load systems', 'error');
+      }
+    }
+
+    /* ======= Plants ======= */
+    async function loadPlants() {
+      const { page, limit, filters } = state;
+      const params = new URLSearchParams({ page, limit });
+      if (filters.q) params.set('search', filters.q);
+      if (filters.system) params.set('system', filters.system);
+      if (filters.status) params.set('status', filters.status);
+
+      const tbody = $('#plantTable tbody');
+      tbody.innerHTML = `<tr><td colspan="8" class="empty loading">Loading plants…</td></tr>`;
+      try {
+        const data = await api('GET', `/api/plants?${params.toString()}`);
+        const items = data.items ?? data.results ?? [];
+        state.total = data.total ?? items.length;
+        renderTable(items);
+        renderPager();
+      } catch (e) {
+        console.error(e);
+        tbody.innerHTML = `<tr><td colspan="8" class="empty">Failed to load plants.</td></tr>`;
+        toast('Failed to load plants', 'error');
+      }
+    }
+
+    function renderTable(items) {
+      const tbody = $('#plantTable tbody');
+      state.selection.clear();
+      $('#checkAll').checked = false;
+      setBulkEnabled();
+      if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty">No plants match your filters.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = items.map(row => {
+        const id = row.id;
+        const status = (row.status || 'draft').toLowerCase();
+        const scls = status === 'published' ? 'pub' : status === 'archived' ? 'arch' : 'draft';
+        const sys = row.system_name || state.systems.find(s => String(s.id) === String(row.system_id))?.name || '—';
+        return `
+          <tr data-id="${id}" role="row" aria-label="Plant: ${esc(row.common_name || 'Unnamed')}">
+            <td><input type="checkbox" class="rowChk" data-id="${id}" aria-label="Select plant"></td>
+            <td><img class="thumb" src="${esc(row.image_url || 'https://via.placeholder.com/58')}" alt="${esc(row.common_name || 'Plant image')}" loading="lazy"></td>
+            <td>
+              <strong>${esc(row.common_name || row.name || '—')}</strong>
+              <div class="muted" style="font-size:.86rem">${esc(row.aliases || '')}</div>
+            </td>
+            <td>${esc(row.scientific_name || '—')}</td>
+            <td><span class="badge">${esc(sys)}</span></td>
+            <td><span class="badge status ${scls}" aria-label="Status: ${esc(status)}">${esc(status)}</span></td>
+            <td>${fmtDate(row.updated_at || row.created_at)}</td>
+            <td>
+              <div class="actions" role="group" aria-label="Plant actions">
+                <button class="iconbtn" title="Edit" aria-label="Edit plant" onclick="onEdit(${id})"><i class="fa-solid fa-pen"></i></button>
+                <button class="iconbtn" title="Toggle Publish" aria-label="Toggle publish status" onclick="onTogglePublish(${id}, '${status}')"><i class="fa-solid fa-toggle-on"></i></button>
+                <button class="iconbtn" title="Delete" aria-label="Delete plant" onclick="onDelete(${id})"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+
+      $$('#plantTable .rowChk').forEach(chk => {
+        chk.addEventListener('change', e => {
+          const id = Number(e.target.dataset.id);
+          if (e.target.checked) state.selection.add(id);
+          else state.selection.delete(id);
+          setBulkEnabled();
+        });
+      });
+    }
+
+    function renderPager() {
+      const pager = $('#pager');
+      const pages = Math.max(1, Math.ceil(state.total / state.limit));
+      const cur = state.page;
+      if (state.total === 0) {
+        pager.innerHTML = '';
+        return;
+      }
+      const mkBtn = (p, label = p, dis = false, act = false) => `
+        <button class="pagebtn ${act ? 'active' : ''}" ${dis ? 'disabled' : ''} onclick="gotoPage(${p})" aria-label="Go to page ${label}">${label}</button>`;
+      let html = mkBtn(Math.max(1, cur - 1), '«', cur === 1);
+      for (let p = Math.max(1, cur - 2); p <= Math.min(pages, cur + 2); p++) {
+        html += mkBtn(p, String(p), false, p === cur);
+      }
+      html += mkBtn(Math.min(pages, cur + 1), '»', cur === pages);
+      pager.innerHTML = html;
+    }
+    function gotoPage(p) { state.page = p; loadPlants(); }
+
+    function setBulkEnabled() {
+      const has = state.selection.size > 0;
+      ['bulkPublish', 'bulkArchive', 'bulkDelete'].forEach(id => { $('#' + id).disabled = !has; });
+    }
+
+    /* ======= Modal / Form ======= */
+    const modal = $('#plantModal');
+    const form = $('#plantForm');
+    const imgInput = $('#image_url');
+    const imgPrev = $('#imgPreview');
+    const modelInput = $('#model_url');
+    const youtubeInput = $('#youtube_url');
+
+    function openModal(editing = null, row = null) {
+      state.editing = editing;
+      $('#modalTitle').textContent = editing ? 'Edit Plant' : 'Add Plant';
+      form.reset();
+      imgPrev.src = '';
+      imgPrev.alt = 'Preview';
+      imgInput.value = '';
+      modelInput.value = '';
+      youtubeInput.value = '';
+      if (row) {
+        $('#common_name').value = row.common_name || row.name || '';
+        $('#scientific_name').value = row.scientific_name || '';
+        $('#aliases').value = row.aliases || '';
+        $('#system_id').value = row.system_id || '';
+        $('#parts_used').value = row.parts_used || '';
+        $('#indications').value = row.indications || '';
+        $('#image_url').value = row.image_url || '';
+        $('#model_url').value = row.model_url || '';
+        $('#youtube_url').value = row.youtube_url || '';
+        $('#status').value = (row.status || 'draft').toLowerCase();
+        $('#tags').value = (Array.isArray(row.tags) ? row.tags.join(', ') : row.tags) || '';
+        if (row.image_url) imgPrev.src = row.image_url;
+      }
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+    function closeModal() {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      state.editing = null;
+    }
+    $('#closeModal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    $('#uploadCover').addEventListener('click', () => coverUploadWidget.open());
+    $('#uploadModel').addEventListener('click', () => modelUploadWidget.open());
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const youtubeUrl = $('#youtube_url').value.trim();
+      if (youtubeUrl && !/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(youtubeUrl)) {
+        toast('Invalid YouTube URL', 'error');
+        return;
+      }
+      const body = {
+        common_name: $('#common_name').value.trim(),
+        scientific_name: $('#scientific_name').value.trim(),
+        aliases: $('#aliases').value.trim(),
+        system_id: $('#system_id').value,
+        parts_used: $('#parts_used').value.trim(),
+        indications: $('#indications').value.trim(),
+        image_url: $('#image_url').value.trim(),
+        model_url: $('#model_url').value.trim(),
+        youtube_url: youtubeUrl,
+        status: $('#status').value,
+        tags: $('#tags').value.split(',').map(s => s.trim()).filter(Boolean),
+      };
+      if (!body.common_name || !body.scientific_name || !body.system_id || !body.image_url) {
+        toast('Please fill all required fields', 'error');
+        return;
+      }
+      try {
+        if (state.editing) {
+          await api('PUT', `/api/plants/${state.editing}`, body);
+          toast('Plant updated successfully');
+        } else {
+          await api('POST', '/api/plants', body);
+          toast('Plant created successfully');
+        }
+        closeModal();
+        loadPlants();
+      } catch (err) {
+        console.error('Form Submission Error:', err);
+        toast(`Failed to ${state.editing ? 'update' : 'create'} plant: ${err.message || 'Unknown error'}`, 'error');
+      }
+    });
+
+    /* ======= Row Actions ======= */
+    async function onEdit(id) {
+      try {
+        let row = null;
+        try { row = await api('GET', `/api/plants/${id}`); }
+        catch { await loadPlants(); }
+        if (!row) {
+          toast('Plant not found', 'error');
+          return;
+        }
+        openModal(id, row);
+      } catch (e) {
+        console.error(e);
+        toast('Failed to open editor', 'error');
+      }
+    }
+    window.onEdit = onEdit;
+
+    async function onTogglePublish(id, current) {
+      const next = current === 'published' ? 'draft' : 'published';
+      try {
+        await api('PUT', `/api/plants/${id}`, { status: next });
+        toast(`Marked as ${next}`);
+        loadPlants();
+      } catch (e) {
+        console.error(e);
+        toast('Update failed', 'error');
+      }
+    }
+    window.onTogglePublish = onTogglePublish;
+
+    async function onDelete(id) {
+      if (!confirm('Delete this plant? This cannot be undone.')) return;
+      try {
+        await api('DELETE', `/api/plants/${id}`);
+        toast('Deleted');
+        loadPlants();
+      } catch (e) {
+        console.error(e);
+        toast('Delete failed', 'error');
+      }
+    }
+    window.onDelete = onDelete;
+
+    /* ======= Bulk Actions ======= */
+    async function bulk(action) {
+      if (state.selection.size === 0) return;
+      const ids = Array.from(state.selection);
+      if (action === 'delete' && !confirm(`Delete ${ids.length} item(s)? This cannot be undone.`)) return;
+      try {
+        await Promise.all(ids.map(id => {
+          if (action === 'publish') return api('PUT', `/api/plants/${id}`, { status: 'published' });
+          if (action === 'archive') return api('PUT', `/api/plants/${id}`, { status: 'archived' });
+          if (action === 'delete') return api('DELETE', `/api/plants/${id}`);
+        }));
+        toast(`Bulk ${action} complete`);
+        state.selection.clear();
+        setBulkEnabled();
+        $('#checkAll').checked = false;
+        loadPlants();
+      } catch (e) {
+        console.error(e);
+        toast('Bulk action failed', 'error');
+      }
+    }
+
+    $('#bulkPublish').addEventListener('click', () => bulk('publish'));
+    $('#bulkArchive').addEventListener('click', () => bulk('archive'));
+    $('#bulkDelete').addEventListener('click', () => bulk('delete'));
+
+    $('#checkAll').addEventListener('change', e => {
+      const on = e.target.checked;
+      $$('.rowChk').forEach(chk => {
+        chk.checked = on;
+        const id = Number(chk.dataset.id);
+        if (on) state.selection.add(id);
+        else state.selection.delete(id);
+      });
+      setBulkEnabled();
+    });
+
+    /* ======= Filters / Search ======= */
+    $('#q').addEventListener('input', debounce(() => {
+      state.filters.q = $('#q').value.trim();
+      state.page = 1;
+      loadPlants();
+    }, 300));
+    $('#systemFilter').addEventListener('change', () => {
+      state.filters.system = $('#systemFilter').value;
+      state.page = 1;
+      loadPlants();
+    });
+    $('#statusFilter').addEventListener('change', () => {
+      state.filters.status = $('#statusFilter').value;
+      state.page = 1;
+      loadPlants();
+    });
+
+    function debounce(fn, wait) {
+      let t;
+      return (...a) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...a), wait);
+      };
+    }
+
+    /* ======= Add Button / Logout ======= */
+    $('#addPlant').addEventListener('click', () => openModal());
+    $('#logoutBtn').addEventListener('click', async () => {
+      try {
+        await api('POST', '/api/auth/logout');
+        toast('Logged out');
+        setTimeout(() => location.href = '/admin.html', 800);
+      } catch (e) {
+        toast('Logout failed', 'error');
+      }
+    });
+
+    /* ======= Init ======= */
+    (async function init() {
+      await loadSystems();
+      await loadPlants();
+    })();
+  </script>
+</body>
+</html>

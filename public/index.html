@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Herbal Garden - Authentication</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: url("https://i.postimg.cc/g23qQnKG/Background-Garden-Photos-Download-Free-High-Quality-Pictures-Freepik.jpg") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: auto;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .auth-container {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.97);
+      padding: 2.5rem 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      width: min(90%, 400px);
+      max-width: 450px;
+      text-align: center;
+      margin: 1rem;
+    }
+
+    .auth-container img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      border: 2px solid #4caf50;
+    }
+
+    .auth-container h2 {
+      margin-bottom: 1.5rem;
+      color: #2e7d32;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .input-group {
+      position: relative;
+      margin: 0.8rem 0;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4caf50;
+      font-size: 1.1rem;
+    }
+
+    .auth-container input,
+    .auth-container select {
+      width: 100%;
+      padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .auth-container input:focus,
+    .auth-container select:focus {
+      border-color: #4caf50;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    }
+
+    .auth-container select {
+      padding-left: 0.8rem;
+    }
+
+    .auth-container button {
+      width: 100%;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #2e7d32, #4caf50);
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .auth-container button:hover {
+      background: linear-gradient(90deg, #43a047, #66bb6a);
+      transform: translateY(-2px);
+    }
+
+    .auth-container p {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    .auth-container a {
+      color: #2e7d32;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .auth-container a:hover {
+      color: #4caf50;
+      text-decoration: underline;
+    }
+
+    .step-container {
+      display: none;
+    }
+
+    .step-container.active {
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: #fff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: 90%;
+      width: 300px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success {
+      border-left: 4px solid #2e7d32;
+    }
+
+    .toast.error {
+      border-left: 4px solid #d32f2f;
+    }
+
+    .toast .toast-message {
+      flex: 1;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .toast .toast-close {
+      margin-left: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .toast .toast-close:hover {
+      color: #333;
+    }
+
+    @media (max-width: 600px) {
+      .auth-container {
+        padding: 1.5rem;
+        width: 90%;
+      }
+
+      .auth-container h2 {
+        font-size: 1.5rem;
+      }
+
+      .auth-container img {
+        width: 60px;
+        height: 60px;
+      }
+
+      .auth-container input,
+      .auth-container select {
+        font-size: 0.9rem;
+        padding: 0.7rem 0.7rem 0.7rem 2.2rem;
+      }
+
+      .auth-container button {
+        font-size: 0.95rem;
+        padding: 0.8rem;
+      }
+
+      .toast {
+        width: 80%;
+        font-size: 0.85rem;
+        padding: 0.7rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <!-- Login Container -->
+  <div class="auth-container" id="loginContainer">
+    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo">
+    <h2>Virtual Herbal Garden - Login</h2>
+    <div>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="loginEmail" placeholder="Email" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+      </div>
+      <button type="button" onclick="handleLogin()">Login</button>
+    </div>
+    <p>Don't have an account? <a onclick="showSignup()">Create New Account</a></p>
+    <p><a onclick="showForgotPassword()">Forgot Password?</a></p>
+  </div>
+
+  <!-- Signup Container -->
+  <div class="auth-container" id="signupContainer" style="display: none;">
+    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo">
+    <h2>Sign Up - Virtual Herbal Garden</h2>
+    <div>
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" id="signupFullName" placeholder="Full Name" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="signupEmail" placeholder="Email" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-briefcase"></i>
+        <select id="signupRole" required>
+          <option value="" disabled selected>Select Role</option>
+          <option value="student">Student</option>
+          <option value="researcher">Researcher</option>
+          <option value="gardener">Gardener</option>
+          <option value="educator">Educator</option>
+          <option value="hobbyist">Hobbyist</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="signupPassword" placeholder="Password" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
+      </div>
+      <button type="button" onclick="handleSignup()">Sign Up</button>
+    </div>
+    <p>Already have an account? <a onclick="showLogin()">Login</a></p>
+  </div>
+
+  <!-- Forgot Password Container -->
+  <div class="auth-container" id="forgotPasswordContainer" style="display: none;">
+    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo">
+    <h2>Forgot Password</h2>
+    <div id="emailStep" class="step-container active">
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="resetEmail" placeholder="Enter Email" required>
+      </div>
+      <button type="button" onclick="sendOTP()">Send OTP</button>
+    </div>
+    <div id="otpStep" class="step-container">
+      <div class="input-group">
+        <i class="fas fa-key"></i>
+        <input type="text" id="otpInput" placeholder="Enter OTP" required>
+      </div>
+      <button type="button" onclick="verifyOTP()">Verify OTP</button>
+    </div>
+    <div id="newPasswordStep" class="step-container">
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="newPassword" placeholder="New Password" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="confirmNewPassword" placeholder="Confirm New Password" required>
+      </div>
+      <button type="button" onclick="resetPassword()">Reset Password</button>
+    </div>
+    <p><a onclick="showLogin()">Back to Login</a></p>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:3000/api/auth';
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span class="toast-message">${message}</span>
+        <span class="toast-close">&times;</span>
+      `;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 100);
+
+      const closeToast = () => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      };
+
+      toast.querySelector('.toast-close').addEventListener('click', closeToast);
+
+      setTimeout(closeToast, 3000);
+    }
+
+    function showSignup() {
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('signupContainer').style.display = 'block';
+      document.getElementById('forgotPasswordContainer').style.display = 'none';
+    }
+
+    function showLogin() {
+      document.getElementById('signupContainer').style.display = 'none';
+      document.getElementById('forgotPasswordContainer').style.display = 'none';
+      document.getElementById('loginContainer').style.display = 'block';
+    }
+
+    function showForgotPassword() {
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('signupContainer').style.display = 'none';
+      document.getElementById('forgotPasswordContainer').style.display = 'block';
+      document.getElementById('emailStep').classList.add('active');
+      document.getElementById('otpStep').classList.remove('active');
+      document.getElementById('newPasswordStep').classList.remove('active');
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          showToast('Login successful! Redirecting...', 'success');
+          localStorage.setItem('token', data.token);
+          setTimeout(() => {
+            window.location.href = 'userdashboard.html';
+          }, 1500);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showToast('Server error', 'error');
+      }
+    }
+
+    async function handleSignup() {
+      const fullName = document.getElementById('signupFullName').value;
+      const email = document.getElementById('signupEmail').value;
+      const role = document.getElementById('signupRole').value;
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName, email, role, password }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          showToast(data.message, 'success');
+          setTimeout(showLogin, 1500);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Signup error:', error);
+        showToast('Server error', 'error');
+      }
+    }
+
+    async function sendOTP() {
+      const email = document.getElementById('resetEmail').value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          showToast(data.message, 'success');
+          document.getElementById('emailStep').classList.remove('active');
+          document.getElementById('otpStep').classList.add('active');
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Send OTP error:', error);
+        showToast('Server error', 'error');
+      }
+    }
+
+    async function verifyOTP() {
+      const email = document.getElementById('resetEmail').value;
+      const otp = document.getElementById('otpInput').value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          showToast(data.message, 'success');
+          document.getElementById('otpStep').classList.remove('active');
+          document.getElementById('newPasswordStep').classList.add('active');
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Verify OTP error:', error);
+        showToast('Server error', 'error');
+      }
+    }
+
+    async function resetPassword() {
+      const email = document.getElementById('resetEmail').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+      if (newPassword !== confirmNewPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, newPassword, confirmNewPassword }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          showToast(data.message, 'success');
+          setTimeout(showLogin, 1500);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Reset password error:', error);
+        showToast('Server error', 'error');
+      }
+    }
+  </script>
+</body>
+</html>
