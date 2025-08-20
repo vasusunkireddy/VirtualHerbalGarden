@@ -10,15 +10,22 @@ function must(k) {
 }
 
 const useSSL = (process.env.MYSQL_SSL || "").toLowerCase() === "true";
+
 let ssl;
 if (useSSL) {
-  const caPath = must("MYSQL_SSL_CA");           // e.g. certs/ca.pem
-  const absCa = path.isAbsolute(caPath) ? caPath : path.join(__dirname, caPath);
-  ssl = {
-    ca: fs.readFileSync(absCa, "utf8"),
-    rejectUnauthorized: true,
-    minVersion: "TLSv1.2",
-  };
+  if (process.env.MYSQL_SSL_CA_B64) {
+    const ca = Buffer.from(process.env.MYSQL_SSL_CA_B64, "base64").toString("utf8");
+    ssl = { ca, rejectUnauthorized: true, minVersion: "TLSv1.2" };
+  } else if (process.env.MYSQL_SSL_CA) {
+    const caPath = path.isAbsolute(process.env.MYSQL_SSL_CA)
+      ? process.env.MYSQL_SSL_CA
+      : path.join(__dirname, process.env.MYSQL_SSL_CA);
+    const ca = fs.readFileSync(caPath, "utf8");
+    ssl = { ca, rejectUnauthorized: true, minVersion: "TLSv1.2" };
+  } else {
+    console.warn("[DB] SSL requested but no CA provided");
+    ssl = { rejectUnauthorized: true, minVersion: "TLSv1.2" }; // will likely fail; better to provide CA
+  }
 }
 
 const pool = mysql.createPool({
@@ -27,21 +34,21 @@ const pool = mysql.createPool({
   user: must("MYSQL_USER"),
   password: must("MYSQL_PASSWORD"),
   database: must("MYSQL_DATABASE"),
-  ssl, // Aiven requires SSL
+  ssl,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
-// quick probe so boot logs are clear
+// quick probe
 (async () => {
   try {
-    const conn = await pool.getConnection();
-    await conn.query("SELECT 1");
-    conn.release();
+    const c = await pool.getConnection();
+    await c.query("SELECT 1");
+    c.release();
     console.log("[DB] ✅ MySQL connected");
-  } catch (err) {
-    console.error("[DB] ❌ MySQL connection failed:", err.message);
+  } catch (e) {
+    console.error("[DB] ❌ MySQL connection failed:", e.message);
   }
 })();
 
