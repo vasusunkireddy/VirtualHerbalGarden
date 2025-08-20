@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
   <title>Virtual Herbal Garden - Authentication</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: "Inter", "Segoe UI", Arial, sans-serif;
-      background: url("https://i.postimg.cc/g23qQnKG/Background-Garden-Photos-Download-Free-High-Quality-Pictures-Freepik.jpg") no-repeat center center fixed;
+      background: url("https://i.postimg.cc/BbMWHHpp/Download-green-background-high-quality-for-free.jpg") no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
@@ -26,18 +22,13 @@
     }
 
     .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: fixed; inset: 0;
       background: rgba(0, 0, 0, 0.6);
       z-index: 0;
     }
 
     .auth-container {
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
       background: rgba(255, 255, 255, 0.98);
       padding: 2.5rem 2rem;
       border-radius: 1.3rem;
@@ -50,263 +41,117 @@
     }
 
     .auth-container img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      margin-bottom: 1.5rem;
-      border: 3px solid #4caf50;
+      width: 100px; height: 100px; border-radius: 50%;
+      margin-bottom: 1.5rem; border: 3px solid #4caf50;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
-    .auth-container img:hover {
-      transform: scale(1.06);
-      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
-    }
+    .auth-container img:hover { transform: scale(1.06); box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
 
     .auth-container h2 {
-      margin-bottom: 2rem;
-      color: #2e7d32;
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: 0.03em;
+      margin-bottom: 2rem; color: #2e7d32;
+      font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: 0.03em;
     }
 
-    .input-group {
-      position: relative;
-      margin: 1rem 0;
-    }
-
+    .input-group { position: relative; margin: 1rem 0; }
     .input-group i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #4caf50;
-      font-size: 1.15rem;
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: #4caf50; font-size: 1.15rem;
     }
 
-    .auth-container input,
-    .auth-container select {
-      width: 100%;
-      padding: 0.9rem 0.9rem 0.9rem 2.8rem;
-      margin: 0.6rem 0;
-      border: 1px solid #e0e0e0;
-      border-radius: 0.7rem;
-      font-size: 1rem;
-      line-height: 1.5;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
+    .auth-container input, .auth-container select {
+      width: 100%; padding: 0.9rem 0.9rem 0.9rem 2.8rem; margin: 0.6rem 0;
+      border: 1px solid #e0e0e0; border-radius: 0.7rem; font-size: 1rem; line-height: 1.5;
+      outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
     }
+    .auth-container select { padding: 0.9rem; }
 
-    .auth-container select {
-      padding: 0.9rem;
-    }
-
-    .auth-container input:focus,
-    .auth-container select:focus {
-      border-color: #4caf50;
-      box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+    .auth-container input:focus, .auth-container select:focus {
+      border-color: #4caf50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
     }
 
     .auth-container button {
-      width: 100%;
-      padding: 1rem;
-      margin-top: 1.5rem;
+      width: 100%; padding: 1rem; margin-top: 1.5rem;
       background: linear-gradient(90deg, #2e7d32, #4caf50);
-      color: #fff;
-      border: none;
-      border-radius: 0.7rem;
-      cursor: pointer;
-      font-size: 1.05rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      color: #fff; border: none; border-radius: 0.7rem; cursor: pointer;
+      font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
       transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
     }
+    .auth-container button:hover { background: linear-gradient(90deg, #43a047, #66bb6a); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(76, 175, 80, 0.35); }
+    .auth-container button:active { transform: translateY(0); }
 
-    .auth-container button:hover {
-      background: linear-gradient(90deg, #43a047, #66bb6a);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(76, 175, 80, 0.35);
-    }
+    .auth-container p { margin-top: 1.5rem; font-size: 0.95rem; color: #333; font-weight: 500; line-height: 1.4; }
+    .auth-container a { color: #2e7d32; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+    .auth-container a:hover { color: #4caf50; text-decoration: underline; }
 
-    .auth-container button:active {
-      transform: translateY(0);
-    }
-
-    .auth-container p {
-      margin-top: 1.5rem;
-      font-size: 0.95rem;
-      color: #333;
-      font-weight: 500;
-      line-height: 1.4;
-    }
-
-    .auth-container a {
-      color: #2e7d32;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-
-    .auth-container a:hover {
-      color: #4caf50;
-      text-decoration: underline;
-    }
-
-    .step-container {
-      display: none;
-    }
-
-    .step-container.active {
-      display: block;
-    }
+    .step-container { display: none; }
+    .step-container.active { display: block; }
 
     .toast {
-      position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: #fff;
-      padding: 1rem 1.5rem;
-      border-radius: 0.7rem;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      max-width: 90%;
-      width: 340px;
+      position: fixed; top: 1.5rem; right: 1.5rem; background: #fff;
+      padding: 1rem 1.5rem; border-radius: 0.7rem; box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+      z-index: 1000; display: flex; align-items: center; opacity: 0; transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease; max-width: 90%; width: 340px;
     }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .toast.success {
-      border-left: 5px solid #2e7d32;
-    }
-
-    .toast.error {
-      border-left: 5px solid #d32f2f;
-    }
-
-    .toast .toast-message {
-      flex: 1;
-      font-size: 0.95rem;
-      color: #333;
-      font-weight: 500;
-    }
-
-    .toast .toast-close {
-      margin-left: 0.8rem;
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: #666;
-    }
-
-    .toast .toast-close:hover {
-      color: #333;
-    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left: 5px solid #2e7d32; }
+    .toast.error { border-left: 5px solid #d32f2f; }
+    .toast .toast-message { flex: 1; font-size: 0.95rem; color: #333; font-weight: 500; }
+    .toast .toast-close { margin-left: 0.8rem; cursor: pointer; font-size: 1.2rem; color: #666; }
+    .toast .toast-close:hover { color: #333; }
 
     @media (max-width: 600px) {
-      .auth-container {
-        padding: 2rem 1.5rem;
-        width: 92%;
-        margin: 1rem;
-      }
-
-      .auth-container h2 {
-        font-size: 1.7rem;
-      }
-
-      .auth-container img {
-        width: 80px;
-        height: 80px;
-      }
-
-      .auth-container input,
-      .auth-container select {
-        font-size: 0.95rem;
-        padding: 0.8rem 0.8rem 0.8rem 2.5rem;
-      }
-
-      .auth-container select {
-        padding: 0.8rem;
-      }
-
-      .auth-container button {
-        font-size: 1rem;
-        padding: 0.9rem;
-      }
-
-      .auth-container p {
-        font-size: 0.9rem;
-      }
-
-      .toast {
-        width: 90%;
-        font-size: 0.9rem;
-        padding: 0.9rem 1.2rem;
-      }
+      .auth-container { padding: 2rem 1.5rem; width: 92%; margin: 1rem; }
+      .auth-container h2 { font-size: 1.7rem; }
+      .auth-container img { width: 80px; height: 80px; }
+      .auth-container input, .auth-container select { font-size: 0.95rem; padding: 0.8rem 0.8rem 0.8rem 2.5rem; }
+      .auth-container select { padding: 0.8rem; }
+      .auth-container button { font-size: 1rem; padding: 0.9rem; }
+      .auth-container p { font-size: 0.9rem; }
+      .toast { width: 90%; font-size: 0.9rem; padding: 0.9rem 1.2rem; }
     }
 
     @media (max-width: 400px) {
-      .auth-container {
-        padding: 1.8rem 1.2rem;
-      }
-
-      .auth-container h2 {
-        font-size: 1.5rem;
-      }
-
-      .auth-container img {
-        width: 70px;
-        height: 70px;
-      }
+      .auth-container { padding: 1.8rem 1.2rem; }
+      .auth-container h2 { font-size: 1.5rem; }
+      .auth-container img { width: 70px; height: 70px; }
     }
   </style>
 </head>
 <body>
   <div class="overlay"></div>
 
-  <!-- Login Container -->
+  <!-- Login -->
   <div class="auth-container" id="loginContainer">
-    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo">
+    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo" />
     <h2>Virtual Herbal Garden - Login</h2>
     <div>
       <div class="input-group">
         <i class="fas fa-envelope"></i>
-        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="email" id="loginEmail" placeholder="Enter your email" required />
       </div>
       <div class="input-group">
         <i class="fas fa-lock"></i>
-        <input type="password" id="loginPassword" placeholder="Password" required>
+        <input type="password" id="loginPassword" placeholder="Password" required />
       </div>
       <button type="button" onclick="handleLogin()">Login</button>
     </div>
-    <p>Don't have an account? <a onclick="showSignup()">Create New Account</a></p>
-    <p><a onclick="showForgotPassword()">Forgot Password?</a></p>
+    <p>Don't have an account? <a href="javascript:void(0)" onclick="showSignup()">Create New Account</a></p>
+    <p><a href="javascript:void(0)" onclick="showForgotPassword()">Forgot Password?</a></p>
   </div>
 
-  <!-- Signup Container -->
+  <!-- Signup -->
   <div class="auth-container" id="signupContainer" style="display: none;">
-    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo">
+    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo" />
     <h2>Sign Up - Virtual Herbal Garden</h2>
     <div>
       <div class="input-group">
         <i class="fas fa-user"></i>
-        <input type="text" id="signupFullName" placeholder="Full Name" required>
+        <input type="text" id="signupFullName" placeholder="Full Name" required />
       </div>
       <div class="input-group">
         <i class="fas fa-envelope"></i>
-        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="email" id="signupEmail" placeholder="Email" required />
       </div>
       <div class="input-group">
         <select id="signupRole" required>
@@ -321,51 +166,52 @@
       </div>
       <div class="input-group">
         <i class="fas fa-lock"></i>
-        <input type="password" id="signupPassword" placeholder="Password" required>
+        <input type="password" id="signupPassword" placeholder="Password" required />
       </div>
       <div class="input-group">
         <i class="fas fa-lock"></i>
-        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
+        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required />
       </div>
       <button type="button" onclick="handleSignup()">Sign Up</button>
     </div>
-    <p>Already have an account? <a onclick="showLogin()">Login</a></p>
+    <p>Already have an account? <a href="javascript:void(0)" onclick="showLogin()">Login</a></p>
   </div>
 
-  <!-- Forgot Password Container -->
+  <!-- Forgot Password -->
   <div class="auth-container" id="forgotPasswordContainer" style="display: none;">
-    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo">
+    <img src="https://i.postimg.cc/pXmq7b3r/download-3.jpg" alt="Herbal Garden Logo" />
     <h2>Forgot Password</h2>
     <div id="emailStep" class="step-container active">
       <div class="input-group">
         <i class="fas fa-envelope"></i>
-        <input type="email" id="resetEmail" placeholder="Enter Email" required>
+        <input type="email" id="resetEmail" placeholder="Enter Email" required />
       </div>
       <button type="button" onclick="sendOTP()">Send OTP</button>
     </div>
     <div id="otpStep" class="step-container">
       <div class="input-group">
         <i class="fas fa-key"></i>
-        <input type="text" id="otpInput" placeholder="Enter OTP" required>
+        <input type="text" id="otpInput" placeholder="Enter OTP" required />
       </div>
       <button type="button" onclick="verifyOTP()">Verify OTP</button>
     </div>
     <div id="newPasswordStep" class="step-container">
       <div class="input-group">
         <i class="fas fa-lock"></i>
-        <input type="password" id="newPassword" placeholder="New Password" required>
+        <input type="password" id="newPassword" placeholder="New Password" required />
       </div>
       <div class="input-group">
         <i class="fas fa-lock"></i>
-        <input type="password" id="confirmNewPassword" placeholder="Confirm New Password" required>
+        <input type="password" id="confirmNewPassword" placeholder="Confirm New Password" required />
       </div>
       <button type="button" onclick="resetPassword()">Reset Password</button>
     </div>
-    <p><a onclick="showLogin()">Back to Login</a></p>
+    <p><a href="javascript:void(0)" onclick="showLogin()">Back to Login</a></p>
   </div>
 
   <script>
-    const API_BASE_URL = 'http://localhost:3000/api/auth';
+    // ✅ Works on localhost and Render (served by the same Express app)
+    const API_BASE_URL = '/api/auth';
 
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
@@ -376,17 +222,13 @@
       `;
       document.body.appendChild(toast);
 
-      setTimeout(() => {
-        toast.classList.add('show');
-      }, 100);
+      setTimeout(() => { toast.classList.add('show'); }, 100);
 
       const closeToast = () => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
       };
-
       toast.querySelector('.toast-close').addEventListener('click', closeToast);
-
       setTimeout(closeToast, 3000);
     }
 
@@ -434,7 +276,7 @@
     }
 
     async function handleLogin() {
-      const email = document.getElementById('loginEmail').value;
+      const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
 
       if (!email || !password) {
@@ -452,11 +294,9 @@
         if (response.ok) {
           showToast('Login successful! Redirecting...', 'success');
           localStorage.setItem('token', data.token);
-          setTimeout(() => {
-            window.location.href = 'userdashboard.html';
-          }, 1500);
+          setTimeout(() => { window.location.href = 'userdashboard.html'; }, 1200);
         } else {
-          showToast(data.message, 'error');
+          showToast(data.message || 'Login failed', 'error');
         }
       } catch (error) {
         console.error('Login error:', error);
@@ -465,8 +305,8 @@
     }
 
     async function handleSignup() {
-      const fullName = document.getElementById('signupFullName').value;
-      const email = document.getElementById('signupEmail').value;
+      const fullName = document.getElementById('signupFullName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
       const role = document.getElementById('signupRole').value;
       const password = document.getElementById('signupPassword').value;
       const confirmPassword = document.getElementById('signupConfirmPassword').value;
@@ -475,7 +315,6 @@
         showToast('Please fill in all fields', 'error');
         return;
       }
-
       if (password !== confirmPassword) {
         showToast('Passwords do not match', 'error');
         return;
@@ -489,10 +328,10 @@
         });
         const data = await response.json();
         if (response.ok) {
-          showToast(data.message, 'success');
-          setTimeout(showLogin, 1500);
+          showToast(data.message || 'Registered!', 'success');
+          setTimeout(showLogin, 1200);
         } else {
-          showToast(data.message, 'error');
+          showToast(data.message || 'Signup failed', 'error');
         }
       } catch (error) {
         console.error('Signup error:', error);
@@ -501,8 +340,7 @@
     }
 
     async function sendOTP() {
-      const email = document.getElementById('resetEmail').value;
-
+      const email = document.getElementById('resetEmail').value.trim();
       if (!email) {
         showToast('Please enter an email', 'error');
         return;
@@ -516,11 +354,11 @@
         });
         const data = await response.json();
         if (response.ok) {
-          showToast(data.message, 'success');
+          showToast(data.message || 'OTP sent', 'success');
           document.getElementById('emailStep').classList.remove('active');
           document.getElementById('otpStep').classList.add('active');
         } else {
-          showToast(data.message, 'error');
+          showToast(data.message || 'Failed to send OTP', 'error');
         }
       } catch (error) {
         console.error('Send OTP error:', error);
@@ -529,8 +367,8 @@
     }
 
     async function verifyOTP() {
-      const email = document.getElementById('resetEmail').value;
-      const otp = document.getElementById('otpInput').value;
+      const email = document.getElementById('resetEmail').value.trim();
+      const otp = document.getElementById('otpInput').value.trim();
 
       if (!otp) {
         showToast('Please enter the OTP', 'error');
@@ -545,11 +383,11 @@
         });
         const data = await response.json();
         if (response.ok) {
-          showToast(data.message, 'success');
+          showToast(data.message || 'OTP verified', 'success');
           document.getElementById('otpStep').classList.remove('active');
           document.getElementById('newPasswordStep').classList.add('active');
         } else {
-          showToast(data.message, 'error');
+          showToast(data.message || 'Invalid or expired OTP', 'error');
         }
       } catch (error) {
         console.error('Verify OTP error:', error);
@@ -558,7 +396,7 @@
     }
 
     async function resetPassword() {
-      const email = document.getElementById('resetEmail').value;
+      const email = document.getElementById('resetEmail').value.trim();
       const newPassword = document.getElementById('newPassword').value;
       const confirmNewPassword = document.getElementById('confirmNewPassword').value;
 
@@ -566,7 +404,6 @@
         showToast('Please fill in all fields', 'error');
         return;
       }
-
       if (newPassword !== confirmNewPassword) {
         showToast('Passwords do not match', 'error');
         return;
@@ -580,10 +417,10 @@
         });
         const data = await response.json();
         if (response.ok) {
-          showToast(data.message, 'success');
-          setTimeout(showLogin, 1500);
+          showToast(data.message || 'Password reset', 'success');
+          setTimeout(showLogin, 1200);
         } else {
-          showToast(data.message, 'error');
+          showToast(data.message || 'Reset failed', 'error');
         }
       } catch (error) {
         console.error('Reset password error:', error);
