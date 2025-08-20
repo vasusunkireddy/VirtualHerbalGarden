@@ -8,16 +8,21 @@ const http = require("http");
 const path = require("path");
 const cors = require("cors");
 
-const pool = require('./db');
+const pool = require("./db");
 const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 
 /* ── Middleware ── */
 app.use(express.json());
+
+// Always allow your Render URL + localhost for dev
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: [
+      "http://localhost:3000",
+      "https://virtualherbalgarden-mr5z.onrender.com",
+    ],
     credentials: true,
   })
 );
@@ -56,27 +61,26 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 
 /* ── Server ── */
 const PORT = Number(process.env.PORT) || 3000;
+const HOST = "0.0.0.0";
 
 async function start() {
   try {
     await initializeDatabase();
   } catch (err) {
     console.error("❌ Database initialization error:", err);
-    // Don’t start the server if DB failed — uncomment if you prefer hard fail:
-    // process.exit(1);
   }
 
   const keyPath = path.join(__dirname, "certs", "key.pem");
   const certPath = path.join(__dirname, "certs", "cert.pem");
-  const useHttps = fs.existsSync(keyPath) && fs.existsSync(certPath);
+  const hasLocalHttps = fs.existsSync(keyPath) && fs.existsSync(certPath);
 
-  if (useHttps) {
+  if (hasLocalHttps) {
     try {
       const credentials = {
         key: fs.readFileSync(keyPath, "utf8"),
         cert: fs.readFileSync(certPath, "utf8"),
       };
-      https.createServer(credentials, app).listen(PORT, () => {
+      https.createServer(credentials, app).listen(PORT, HOST, () => {
         console.log(`🔐 HTTPS server running at https://localhost:${PORT}`);
       });
       return;
@@ -84,11 +88,11 @@ async function start() {
       console.warn("⚠️ Failed to load HTTPS certs, falling back to HTTP:", e.message);
     }
   } else {
-    console.warn("⚠️ No SSL certs found in ./certs — starting HTTP server.");
+    console.warn("ℹ️ No local HTTPS certs found — starting HTTP server (expected on Render).");
   }
 
-  http.createServer(app).listen(PORT, () => {
-    console.log(`🔓 HTTP server running at http://localhost:${PORT}`);
+  http.createServer(app).listen(PORT, HOST, () => {
+    console.log(`🔓 HTTP server running at http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`);
   });
 }
 
