@@ -9,7 +9,7 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
       background: url("https://i.postimg.cc/g23qQnKG/Background-Garden-Photos-Download-Free-High-Quality-Pictures-Freepik.jpg") no-repeat center center fixed;
       background-size: cover;
       display: flex;
@@ -25,41 +25,49 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.55);
       z-index: 0;
     }
 
     .auth-container {
       position: relative;
       z-index: 1;
-      background: rgba(255, 255, 255, 0.97);
-      padding: 2.5rem 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.98);
+      padding: 2.5rem 2rem;
+      border-radius: 1.2rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
       width: min(90%, 400px);
-      max-width: 450px;
+      max-width: 420px;
       text-align: center;
-      margin: 1rem;
+      margin: 1.5rem;
+      transition: transform 0.3s ease;
     }
 
     .auth-container img {
-      width: 80px;
-      height: 80px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
-      margin-bottom: 1rem;
-      border: 2px solid #4caf50;
+      margin-bottom: 1.2rem;
+      border: 3px solid #4caf50;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .auth-container img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
     }
 
     .auth-container h2 {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.8rem;
       color: #2e7d32;
-      font-size: 1.8rem;
-      font-weight: 600;
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
 
     .input-group {
       position: relative;
-      margin: 0.8rem 0;
+      margin: 0.9rem 0;
     }
 
     .input-group i {
@@ -74,56 +82,60 @@
     .auth-container input,
     .auth-container select {
       width: 100%;
-      padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+      padding: 0.85rem 0.85rem 0.85rem 2.5rem;
       margin: 0.5rem 0;
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 0.6rem;
       font-size: 0.95rem;
       outline: none;
       box-sizing: border-box;
       transition: border-color 0.3s, box-shadow 0.3s;
     }
 
+    .auth-container select {
+      padding: 0.85rem;
+    }
+
     .auth-container input:focus,
     .auth-container select:focus {
       border-color: #4caf50;
-      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-    }
-
-    .auth-container select {
-      padding-left: 0.8rem;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.25);
     }
 
     .auth-container button {
       width: 100%;
-      padding: 0.9rem;
-      margin-top: 1rem;
+      padding: 0.95rem;
+      margin-top: 1.2rem;
       background: linear-gradient(90deg, #2e7d32, #4caf50);
       color: #fff;
       border: none;
-      border-radius: 0.5rem;
+      border-radius: 0.6rem;
       cursor: pointer;
       font-size: 1rem;
       font-weight: 600;
-      transition: background 0.3s, transform 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
     }
 
     .auth-container button:hover {
       background: linear-gradient(90deg, #43a047, #66bb6a);
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
     }
 
     .auth-container p {
-      margin-top: 1rem;
+      margin-top: 1.2rem;
       font-size: 0.9rem;
-      color: #444;
+      color: #333;
+      font-weight: 500;
     }
 
     .auth-container a {
       color: #2e7d32;
       text-decoration: none;
       font-weight: 600;
-      transition: color 0.3s;
+      transition: color 0.3s, text-decoration 0.3s;
     }
 
     .auth-container a:hover {
@@ -141,12 +153,12 @@
 
     .toast {
       position: fixed;
-      top: 1rem;
-      right: 1rem;
+      top: 1.5rem;
+      right: 1.5rem;
       background: #fff;
-      padding: 0.8rem 1.2rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 0.9rem 1.3rem;
+      border-radius: 0.6rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       z-index: 1000;
       display: flex;
       align-items: center;
@@ -154,7 +166,7 @@
       transform: translateY(-20px);
       transition: opacity 0.3s ease, transform 0.3s ease;
       max-width: 90%;
-      width: 300px;
+      width: 320px;
     }
 
     .toast.show {
@@ -163,23 +175,24 @@
     }
 
     .toast.success {
-      border-left: 4px solid #2e7d32;
+      border-left: 5px solid #2e7d32;
     }
 
     .toast.error {
-      border-left: 4px solid #d32f2f;
+      border-left: 5px solid #d32f2f;
     }
 
     .toast .toast-message {
       flex: 1;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #333;
+      font-weight: 500;
     }
 
     .toast .toast-close {
-      margin-left: 0.5rem;
+      margin-left: 0.6rem;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.1rem;
       color: #666;
     }
 
@@ -189,34 +202,39 @@
 
     @media (max-width: 600px) {
       .auth-container {
-        padding: 1.5rem;
-        width: 90%;
+        padding: 1.8rem 1.2rem;
+        width: 92%;
+        margin: 1rem;
       }
 
       .auth-container h2 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
       }
 
       .auth-container img {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
       }
 
       .auth-container input,
       .auth-container select {
         font-size: 0.9rem;
-        padding: 0.7rem 0.7rem 0.7rem 2.2rem;
+        padding: 0.75rem 0.75rem 0.75rem 2.3rem;
+      }
+
+      .auth-container select {
+        padding: 0.75rem;
       }
 
       .auth-container button {
         font-size: 0.95rem;
-        padding: 0.8rem;
+        padding: 0.85rem;
       }
 
       .toast {
-        width: 80%;
-        font-size: 0.85rem;
-        padding: 0.7rem 1rem;
+        width: 85%;
+        font-size: 0.9rem;
+        padding: 0.8rem 1.1rem;
       }
     }
   </style>
@@ -257,7 +275,6 @@
         <input type="email" id="signupEmail" placeholder="Email" required>
       </div>
       <div class="input-group">
-        <i class="fas fa-briefcase"></i>
         <select id="signupRole" required>
           <option value="" disabled selected>Select Role</option>
           <option value="student">Student</option>

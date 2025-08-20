@@ -1,184 +1,181 @@
+// routes/auth.routes.js
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const mysql = require('mysql2/promise');
 const crypto = require('crypto');
 require('dotenv').config();
 
+const pool = require('../db'); // ✅ use the shared pool that loads Aiven CA
+
 const router = express.Router();
 
-// MySQL Connection Pool
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST,
-  port: process.env.MYSQL_PORT,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  ssl: process.env.MYSQL_SSL === 'true' ? {} : null,
-});
-
-// Nodemailer Transporter
+/* ──────────────────────────────
+   Email (Gmail App Password)
+──────────────────────────────── */
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
 });
 
-// Signup Route
+/* ──────────────────────────────
+   Helpers
+──────────────────────────────── */
+const VALID_ROLES = ['student', 'researcher', 'gardener', 'educator', 'hobbyist', 'other'];
+
+function bad(res, message, code = 400) {
+  return res.status(code).json({ success: false, message });
+}
+
+/* ──────────────────────────────
+   Signup
+──────────────────────────────── */
 router.post('/signup', async (req, res) => {
   try {
-    const { fullName, email, role, password } = req.body;
+    const { fullName, email, role, password } = req.body || {};
 
     if (!fullName || !email || !role || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return bad(res, 'All fields are required');
+    }
+    if (!VALID_ROLES.includes(role)) {
+      return bad(res, 'Invalid role');
     }
 
-    const validRoles = ['student', 'researcher', 'gardener', 'educator', 'hobbyist', 'other'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({ message: 'Invalid role' });
+    const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (existing.length) {
+      return bad(res, 'Email already exists');
     }
 
-    const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (existingUser.length > 0) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
     await pool.query(
       'INSERT INTO users (fullName, email, role, password) VALUES (?, ?, ?, ?)',
-      [fullName, email, role, hashedPassword]
+      [fullName, email, role, hashed]
     );
 
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(201).json({ success: true, message: 'User registered successfully' });
+  } catch (err) {
+    console.error('Signup error:', err);
+    return bad(res, 'Server error', 500);
   }
 });
 
-// Login Route
+/* ──────────────────────────────
+   Login
+──────────────────────────────── */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-
+    const { email, password } = req.body || {};
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+      return bad(res, 'Email and password are required');
     }
 
-    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    const user = users[0];
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    const user = rows?.[0];
+    if (!user) return bad(res, 'Invalid email or password');
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) return bad(res, 'Invalid email or password');
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES }
+      { expiresIn: process.env.JWT_EXPIRES || '7d' }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
+      success: true,
       message: 'Login successful',
       token,
       user: { id: user.id, fullName: user.fullName, email: user.email, role: user.role },
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+  } catch (err) {
+    console.error('Login error:', err);
+    return bad(res, 'Server error', 500);
   }
 });
 
-// Forgot Password - Send OTP
+/* ──────────────────────────────
+   Forgot Password → Send OTP
+──────────────────────────────── */
 router.post('/forgot-password', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.body || {};
+    if (!email) return bad(res, 'Email is required');
 
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-
-    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    const user = users[0];
-    if (!user) {
-      return res.status(400).json({ message: 'Email not found' });
-    }
+    const [rows] = await pool.query('SELECT id, fullName FROM users WHERE email = ?', [email]);
+    const user = rows?.[0];
+    if (!user) return bad(res, 'Email not found');
 
     const otp = crypto.randomInt(100000, 999999).toString();
-    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    await pool.query('UPDATE users SET otp = ?, otpExpires = ? WHERE email = ?', [otp, new Date(otpExpires), email]);
+    await pool.query('UPDATE users SET otp = ?, otpExpires = ? WHERE id = ?', [otp, otpExpires, user.id]);
 
-    const mailOptions = {
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Virtual Herbal Garden - Password Reset OTP',
-      text: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`,
-    };
+      text: `Hi ${user.fullName || ''},\n\nYour OTP is: ${otp}\nIt is valid for 10 minutes.\n\nIf you didn’t request this, you can ignore this email.`,
+    });
 
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'OTP sent to your email' });
-  } catch (error) {
-    console.error('Forgot password error:', error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(200).json({ success: true, message: 'OTP sent to your email' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return bad(res, 'Server error', 500);
   }
 });
 
-// Verify OTP
+/* ──────────────────────────────
+   Verify OTP
+──────────────────────────────── */
 router.post('/verify-otp', async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp } = req.body || {};
+    if (!email || !otp) return bad(res, 'Email and OTP are required');
 
-    if (!email || !otp) {
-      return res.status(400).json({ message: 'Email and OTP are required' });
+    const [rows] = await pool.query('SELECT otp, otpExpires FROM users WHERE email = ?', [email]);
+    const user = rows?.[0];
+    if (!user) return bad(res, 'Invalid or expired OTP');
+
+    const expired = user.otpExpires ? new Date(user.otpExpires).getTime() < Date.now() : true;
+    if (user.otp !== otp || expired) {
+      return bad(res, 'Invalid or expired OTP');
     }
 
-    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    const user = users[0];
-    if (!user || user.otp !== otp || new Date(user.otpExpires) < Date.now()) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
-
-    res.status(200).json({ message: 'OTP verified successfully' });
-  } catch (error) {
-    console.error('OTP verification error:', error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(200).json({ success: true, message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error('OTP verification error:', err);
+    return bad(res, 'Server error', 500);
   }
 });
 
-// Reset Password
+/* ──────────────────────────────
+   Reset Password
+──────────────────────────────── */
 router.post('/reset-password', async (req, res) => {
   try {
-    const { email, newPassword, confirmNewPassword } = req.body;
-
+    const { email, newPassword, confirmNewPassword } = req.body || {};
     if (!email || !newPassword || !confirmNewPassword) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return bad(res, 'All fields are required');
     }
-
     if (newPassword !== confirmNewPassword) {
-      return res.status(400).json({ message: 'Passwords do not match' });
+      return bad(res, 'Passwords do not match');
     }
 
-    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    const user = users[0];
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
+    const [rows] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+    const user = rows?.[0];
+    if (!user) return bad(res, 'User not found');
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await pool.query('UPDATE users SET password = ?, otp = NULL, otpExpires = NULL WHERE email = ?', [hashedPassword, email]);
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+      'UPDATE users SET password = ?, otp = NULL, otpExpires = NULL WHERE id = ?',
+      [hashed, user.id]
+    );
 
-    res.status(200).json({ message: 'Password reset successfully' });
-  } catch (error) {
-    console.error('Reset password error:', error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(200).json({ success: true, message: 'Password reset successfully' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    return bad(res, 'Server error', 500);
   }
 });
 

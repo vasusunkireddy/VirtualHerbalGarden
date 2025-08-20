@@ -1,50 +1,47 @@
 // db.js
-const mysql = require('mysql2/promise');
-const fs = require('fs');
-require('dotenv').config();
+const fs = require("fs");
+const path = require("path");
+const mysql = require("mysql2/promise");
 
-// Build SSL config only if explicitly enabled
+function must(k) {
+  const v = process.env[k];
+  if (!v) throw new Error(`[env] Missing ${k}`);
+  return v.trim();
+}
+
+const useSSL = (process.env.MYSQL_SSL || "").toLowerCase() === "true";
 let ssl;
-if (String(process.env.MYSQL_SSL).toLowerCase() === 'true') {
-  const caPath = process.env.MYSQL_CA || 'ca.pem';
-  ssl = { ca: fs.readFileSync(caPath, 'utf8') };
+if (useSSL) {
+  const caPath = must("MYSQL_SSL_CA");           // e.g. certs/ca.pem
+  const absCa = path.isAbsolute(caPath) ? caPath : path.join(__dirname, caPath);
+  ssl = {
+    ca: fs.readFileSync(absCa, "utf8"),
+    rejectUnauthorized: true,
+    minVersion: "TLSv1.2",
+  };
 }
 
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || 'localhost',
-  port: Number(process.env.MYSQL_PORT || 3306),
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-
-  // Connection behavior
+  host: must("MYSQL_HOST"),
+  port: Number(must("MYSQL_PORT")),
+  user: must("MYSQL_USER"),
+  password: must("MYSQL_PASSWORD"),
+  database: must("MYSQL_DATABASE"),
+  ssl, // Aiven requires SSL
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-
-  // Data handling
-  // Return DATETIME/TIMESTAMP as strings to avoid timezone surprises
-  dateStrings: true,
-  // Never enable multiple statements unless you absolutely need it
-  multipleStatements: false,
-
-  // Only set ssl if provided
-  ...(ssl ? { ssl } : {})
 });
 
-// Optional: quick startup ping & helpful console log
+// quick probe so boot logs are clear
 (async () => {
   try {
     const conn = await pool.getConnection();
-    await conn.ping();
+    await conn.query("SELECT 1");
     conn.release();
-    console.log(
-      `[DB] Connected to MySQL ${process.env.MYSQL_HOST}:${process.env.MYSQL_PORT} / ${process.env.MYSQL_DATABASE} (SSL=${!!ssl})`
-    );
+    console.log("[DB] ✅ MySQL connected");
   } catch (err) {
-    console.error('[DB] MySQL connection failed:', err.message);
+    console.error("[DB] ❌ MySQL connection failed:", err.message);
   }
 })();
 
